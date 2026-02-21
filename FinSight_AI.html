@@ -1,0 +1,871 @@
+<!DOCTYPE html>
+<html lang="en" class="dark">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>FinSight AI - Precision Finance</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@200;300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <!-- Lucide Icons CDN -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#13b6ec',
+                        'background-dark': '#101d22',
+                    },
+                    fontFamily: {
+                        sans: ['Manrope', 'sans-serif'],
+                    }
+                }
+            }
+        }
+    </script>
+    
+    <style>
+        body {
+            font-family: 'Manrope', sans-serif;
+            overflow: hidden; /* Prevent body scroll, use app-container */
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #0a1418;
+        }
+        #app-container {
+            width: 100vw;
+            height: 100vh;
+            position: relative;
+            overflow: hidden;
+            background-color: #101d22;
+        }
+        /* Desktop/Tablet: 16:9 */
+        @media (min-width: 768px) {
+            #app-container {
+                aspect-ratio: 16 / 9;
+                height: auto;
+                max-height: 95vh;
+                max-width: 95vw;
+                border-radius: 12px;
+                box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.5);
+                border: 1px solid rgba(59, 77, 84, 0.3);
+            }
+        }
+        /* Mobile: 9:16 */
+        @media (max-width: 767px) {
+            #app-container {
+                aspect-ratio: 9 / 16;
+                height: auto;
+                max-height: 100vh;
+                max-width: 100vw;
+            }
+        }
+        .mesh-gradient {
+            background-color: #101d22;
+            background-image: 
+                radial-gradient(at 0% 0%, rgba(19, 182, 236, 0.15) 0px, transparent 50%),
+                radial-gradient(at 100% 100%, rgba(34, 197, 94, 0.1) 0px, transparent 50%),
+                radial-gradient(at 100% 0%, rgba(19, 182, 236, 0.05) 0px, transparent 50%);
+        }
+        .glass-card {
+            background: rgba(28, 36, 39, 0.7);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(59, 77, 84, 0.5);
+        }
+        .screen {
+            display: none;
+            opacity: 0;
+            transition: opacity 0.3s ease-in-out;
+            width: 100%;
+            height: 100%;
+            overflow-y: auto;
+            scrollbar-width: none; /* Firefox */
+        }
+        .screen::-webkit-scrollbar {
+            display: none; /* Chrome, Safari, Edge */
+        }
+        .screen.active {
+            display: flex;
+            opacity: 1;
+        }
+        input::-webkit-outer-spin-button,
+        input::-webkit-inner-spin-button {
+            -webkit-appearance: none;
+            margin: 0;
+        }
+    </style>
+</head>
+<body class="bg-background-dark text-slate-100 min-h-screen flex items-center justify-center mesh-gradient">
+    
+    <div id="app-container" class="mesh-gradient">
+        <!-- Background Decorative Elements -->
+        <div id="bg-decor" class="absolute top-0 left-0 w-full h-full -z-10 pointer-events-none overflow-hidden">
+            <div class="absolute top-[-10%] right-[-5%] w-[400px] h-[400px] bg-primary/10 rounded-full blur-[100px]"></div>
+            <div class="absolute bottom-[-10%] left-[-5%] w-[400px] h-[400px] bg-green-500/5 rounded-full blur-[100px]"></div>
+        </div>
+
+    <!-- LOGIN SCREEN -->
+    <div id="login-screen" class="screen active w-full flex-col items-center justify-start md:justify-center py-12">
+        <div class="w-full max-w-[440px] px-4">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center mb-4 border border-primary/30 shadow-[0_0_20px_rgba(19,182,236,0.2)]">
+                    <i data-lucide="trending-up" class="text-primary w-8 h-8"></i>
+                </div>
+                <h1 class="text-slate-100 text-3xl font-extrabold tracking-tight">FinSight <span class="text-primary">AI</span></h1>
+                <p class="text-slate-400 mt-2 text-sm font-medium">Precision Intelligence for Modern Finance</p>
+            </div>
+
+            <div class="glass-card rounded-xl p-8 shadow-2xl">
+                <div class="mb-8">
+                    <h2 class="text-slate-100 text-xl font-bold">Welcome Back</h2>
+                    <p class="text-slate-400 text-sm mt-1">Please enter your details to sign in.</p>
+                </div>
+                <form id="login-form" class="space-y-5">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="email" required class="w-full pl-11 pr-4 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="name@company.com">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <div class="flex items-center justify-between ml-1">
+                            <label class="text-sm font-semibold text-slate-300">Password</label>
+                            <a href="#" class="text-xs font-bold text-primary hover:text-primary/80 transition-colors">Forgot password?</a>
+                        </div>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="password" id="login-pass" required class="w-full pl-11 pr-12 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="Enter your password">
+                            <button type="button" onclick="togglePass('login-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg shadow-[0_0_15px_rgba(19,182,236,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+                        Sign In to Dashboard
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+                <div class="mt-8 text-center border-t border-[#3b4d54] pt-6">
+                    <p class="text-slate-400 text-sm">New to FinSight AI? <button onclick="showScreen('register-screen')" class="text-primary font-bold hover:underline ml-1">Create an account</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- REGISTER SCREEN -->
+    <div id="register-screen" class="screen w-full flex-col items-center justify-start md:justify-center py-12">
+        <div class="w-full max-w-[440px] px-4">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center mb-4 border border-primary/30 shadow-[0_0_20px_rgba(19,182,236,0.2)]">
+                    <i data-lucide="trending-up" class="text-primary w-8 h-8"></i>
+                </div>
+                <h1 class="text-slate-100 text-3xl font-extrabold tracking-tight">FinSight <span class="text-primary">AI</span></h1>
+                <p class="text-slate-400 mt-2 text-sm font-medium">Precision Intelligence for Modern Finance</p>
+            </div>
+
+            <div class="glass-card rounded-xl p-8 shadow-2xl">
+                <div class="mb-8">
+                    <h2 class="text-slate-100 text-xl font-bold">Create Account</h2>
+                    <p class="text-slate-400 text-sm mt-1">Join the future of modern finance.</p>
+                </div>
+                <form id="register-form" class="space-y-4">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Full Name</label>
+                        <div class="relative">
+                            <i data-lucide="user" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="text" required class="w-full pl-11 pr-4 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="John Doe">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Email Address</label>
+                        <div class="relative">
+                            <i data-lucide="mail" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="email" required class="w-full pl-11 pr-4 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="name@company.com">
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Create Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="password" id="reg-pass" required class="w-full pl-11 pr-12 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="At least 8 characters">
+                            <button type="button" onclick="togglePass('reg-pass')" class="absolute right-3 top-1/2 -translate-y-1/2 text-slate-500 hover:text-primary transition-colors">
+                                <i data-lucide="eye" class="w-5 h-5"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Confirm Password</label>
+                        <div class="relative">
+                            <i data-lucide="lock" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <input type="password" id="reg-confirm" required class="w-full pl-11 pr-4 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="Re-enter password">
+                        </div>
+                        <p id="reg-error" class="hidden text-[10px] text-red-500 ml-1 font-medium">Passwords do not match</p>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg shadow-[0_0_15px_rgba(19,182,236,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group mt-2">
+                        Create My Account
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+                <div class="mt-8 text-center border-t border-[#3b4d54] pt-6">
+                    <p class="text-slate-400 text-sm">Already have an account? <button onclick="showScreen('login-screen')" class="text-primary font-bold hover:underline ml-1">Sign In</button></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- INCOME SCREEN (Now Budget Setup) -->
+    <div id="income-screen" class="screen w-full flex-col items-center justify-start md:justify-center py-12">
+        <div class="w-full max-w-[440px] px-4">
+            <div class="flex flex-col items-center mb-8">
+                <div class="w-14 h-14 bg-primary/20 rounded-xl flex items-center justify-center mb-4 border border-primary/30 shadow-[0_0_20px_rgba(19,182,236,0.2)]">
+                    <i data-lucide="indian-rupee" class="text-primary w-8 h-8"></i>
+                </div>
+                <h1 class="text-slate-100 text-3xl font-extrabold tracking-tight">FinSight <span class="text-primary">AI</span></h1>
+                <p class="text-slate-400 mt-2 text-sm font-medium">Personalizing Your Intelligence</p>
+            </div>
+
+            <div class="glass-card rounded-xl p-8 shadow-2xl">
+                <div class="mb-8">
+                    <h2 class="text-slate-100 text-xl font-bold">Budget Setup</h2>
+                    <p class="text-slate-400 text-sm mt-1">Tell us about your monthly funds for analysis.</p>
+                </div>
+                <form id="income-form" class="space-y-6">
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Payment Source</label>
+                        <div class="grid grid-cols-3 gap-3">
+                            <label class="cursor-pointer">
+                                <input type="radio" name="source" value="Salary" class="hidden peer" checked>
+                                <div class="p-2 text-center text-[10px] font-bold border border-[#3b4d54] rounded-lg peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary transition-all">Salary</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="source" value="Pocket Money" class="hidden peer">
+                                <div class="p-2 text-center text-[10px] font-bold border border-[#3b4d54] rounded-lg peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary transition-all">Pocket Money</div>
+                            </label>
+                            <label class="cursor-pointer">
+                                <input type="radio" name="source" value="Bonus" class="hidden peer">
+                                <div class="p-2 text-center text-[10px] font-bold border border-[#3b4d54] rounded-lg peer-checked:bg-primary/20 peer-checked:border-primary peer-checked:text-primary transition-all">Bonus</div>
+                            </label>
+                        </div>
+                    </div>
+                    <div class="space-y-2">
+                        <label class="text-sm font-semibold text-slate-300 ml-1">Total Amount (Incl. Bonus/Salary)</label>
+                        <div class="relative">
+                            <i data-lucide="wallet" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-5 h-5"></i>
+                            <div class="relative">
+                                <span class="absolute left-11 top-1/2 -translate-y-1/2 text-slate-400 font-bold">₹</span>
+                                <input type="number" id="budget-input" required class="w-full pl-16 pr-4 py-3.5 bg-[#1c2427] border border-[#3b4d54] rounded-lg text-white placeholder:text-[#9db2b9] focus:ring-2 focus:ring-primary/50 focus:border-primary transition-all outline-none" placeholder="e.g. 75,000">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                        <p class="text-[11px] text-slate-400 leading-relaxed">
+                            <span class="text-primary font-bold">Note:</span> This total will be considered as your <span class="text-white font-bold">budget for the whole month</span>.
+                        </p>
+                    </div>
+                    <button type="submit" class="w-full bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-lg shadow-[0_0_15px_rgba(19,182,236,0.3)] active:scale-[0.98] transition-all flex items-center justify-center gap-2 group">
+                        Set Monthly Budget
+                        <i data-lucide="arrow-right" class="w-5 h-5 group-hover:translate-x-1 transition-transform"></i>
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <!-- DASHBOARD SCREEN -->
+    <div id="dashboard-screen" class="screen w-full h-screen flex bg-background-dark text-slate-100 overflow-hidden">
+        <aside class="w-64 border-r border-[#3b4d54] bg-[#1c2427]/50 backdrop-blur-md flex flex-col">
+            <div class="p-6 flex items-center gap-3">
+                <div class="w-8 h-8 bg-primary/20 rounded-lg flex items-center justify-center border border-primary/30">
+                    <i data-lucide="trending-up" class="text-primary w-5 h-5"></i>
+                </div>
+                <span class="font-extrabold text-xl tracking-tight">FinSight <span class="text-primary">AI</span></span>
+            </div>
+            <nav class="flex-1 px-4 space-y-2 mt-4">
+                <button onclick="showScreen('dashboard-screen')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium bg-primary/10 text-primary border border-primary/20">
+                    <i data-lucide="layout-dashboard" class="w-5 h-5"></i> Dashboard
+                </button>
+                <button onclick="openProfileModal()" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-white/5 hover:text-white transition-colors">
+                    <i data-lucide="user" class="w-5 h-5"></i> Profile
+                </button>
+            </nav>
+            <div class="p-4 border-t border-[#3b4d54]">
+                <button onclick="showScreen('login-screen')" class="w-full flex items-center gap-3 px-4 py-3 rounded-lg text-sm font-medium text-slate-400 hover:bg-red-500/10 hover:text-red-400 transition-colors">
+                    <i data-lucide="log-out" class="w-5 h-5"></i> Sign Out
+                </button>
+            </div>
+        </aside>
+        <main class="flex-1 flex flex-col overflow-hidden">
+            <header class="h-16 border-b border-[#3b4d54] flex items-center justify-between px-8 bg-[#1c2427]/30">
+                <div class="relative w-96">
+                    <i data-lucide="search" class="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500 w-4 h-4"></i>
+                    <input type="text" onkeydown="handleSearch(event)" placeholder="Search assets, reports, or trends..." class="w-full bg-[#1c2427] border border-[#3b4d54] rounded-full pl-10 pr-4 py-2 text-sm outline-none focus:ring-1 focus:ring-primary/50">
+                </div>
+                <div class="flex items-center gap-4">
+                    <button onclick="toggleNotifications()" class="p-2 text-slate-400 hover:text-white transition-colors relative">
+                        <i data-lucide="bell" class="w-5 h-5"></i>
+                        <span class="absolute top-2 right-2 w-2 h-2 bg-primary rounded-full border-2 border-background-dark"></span>
+                    </button>
+                    <div onclick="openProfileModal()" class="w-8 h-8 rounded-full bg-gradient-to-br from-primary to-emerald-400 border border-white/20 cursor-pointer"></div>
+                </div>
+            </header>
+            <div class="flex-1 overflow-y-auto p-8 space-y-8">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold">Market Overview</h1>
+                        <p class="text-slate-400 text-sm">Real-time precision intelligence for your assets.</p>
+                    </div>
+                    <button onclick="generateReport(this)" class="bg-primary text-white px-4 py-2 rounded-lg text-sm font-bold flex items-center gap-2 hover:bg-primary/90 transition-all">
+                        Generate Report <i data-lucide="chevron-right" class="w-4 h-4"></i>
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <div class="glass-card p-6 rounded-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-primary/10 rounded-lg"><i data-lucide="wallet" class="w-5 h-5 text-primary"></i></div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full bg-green-500/10 text-green-400">+12.5%</span>
+                        </div>
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-wider">Monthly Budget</p>
+                        <h3 id="display-budget" class="text-2xl font-bold mt-1">₹0.00</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-primary/10 rounded-lg"><i data-lucide="pie-chart" class="w-5 h-5 text-primary"></i></div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full bg-green-500/10 text-green-400">+3</span>
+                        </div>
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-wider">Active Investments</p>
+                        <h3 class="text-2xl font-bold mt-1">42</h3>
+                    </div>
+                    <div class="glass-card p-6 rounded-xl">
+                        <div class="flex items-center justify-between mb-4">
+                            <div class="p-2 bg-primary/10 rounded-lg"><i data-lucide="shield-check" class="w-5 h-5 text-primary"></i></div>
+                            <span class="text-xs font-bold px-2 py-1 rounded-full bg-slate-500/10 text-slate-400">Stable</span>
+                        </div>
+                        <p class="text-slate-400 text-xs font-medium uppercase tracking-wider">AI Confidence Score</p>
+                        <h3 class="text-2xl font-bold mt-1">98.4%</h3>
+                    </div>
+                </div>
+                <div class="glass-card p-8 rounded-xl flex flex-col">
+                    <div class="flex items-center justify-between mb-6">
+                        <h3 class="font-bold">Performance Projection</h3>
+                        <div class="flex gap-2">
+                            <button onclick="updateGraph('1D', this)" class="graph-tab px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-white">1D</button>
+                            <button onclick="updateGraph('1W', this)" class="graph-tab px-3 py-1 rounded-md text-xs font-bold text-slate-400 hover:text-white">1W</button>
+                            <button onclick="updateGraph('1M', this)" class="graph-tab px-3 py-1 rounded-md text-xs font-bold bg-primary text-white">1M</button>
+                        </div>
+                    </div>
+                    <div id="graph-container" class="w-full aspect-video relative">
+                        <!-- SVG Graph will be injected here -->
+                    </div>
+                </div>
+
+                <!-- NEW: Spending Money Last Month Section -->
+                <div class="glass-card rounded-xl overflow-hidden flex flex-col">
+                    <div class="p-6 border-b border-[#3b4d54] flex flex-col md:flex-row md:items-center justify-between gap-4">
+                        <div>
+                            <h3 class="font-bold">Spending Money Last Month</h3>
+                            <span class="text-xs text-slate-400">March 2026 • Total: <span id="total-spending-amount" class="text-primary font-bold">₹0</span></span>
+                        </div>
+                        <div class="flex gap-2">
+                            <select id="category-filter" onchange="renderSpendings()" class="bg-[#1c2427] border border-[#3b4d54] rounded-lg px-3 py-1.5 text-xs text-slate-300 outline-none focus:border-primary">
+                                <option value="All">All Categories</option>
+                                <option value="Rent">Rent</option>
+                                <option value="Food">Food</option>
+                                <option value="Transport">Transport</option>
+                                <option value="Entertainment">Entertainment</option>
+                                <option value="Shopping">Shopping</option>
+                                <option value="Bills">Bills</option>
+                                <option value="Subscriptions">Subscriptions</option>
+                                <option value="Misc">Misc</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm">
+                            <thead class="bg-[#1c2427] text-slate-400 uppercase text-[10px] font-bold tracking-wider">
+                                <tr>
+                                    <th class="px-6 py-4">Date</th>
+                                    <th class="px-6 py-4">Category</th>
+                                    <th class="px-6 py-4">Description</th>
+                                    <th class="px-6 py-4 text-right">Amount (₹)</th>
+                                </tr>
+                            </thead>
+                            <tbody id="spendings-body" class="divide-y divide-[#3b4d54]">
+                                <!-- Dynamic Rows -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ANALYTICS SCREEN REMOVED -->
+
+    <!-- PROFILE MODAL -->
+    <div id="profile-modal" class="fixed inset-0 z-50 hidden items-center justify-center bg-black/60 backdrop-blur-sm p-4">
+        <div class="glass-card w-full max-w-md rounded-2xl p-8 shadow-2xl relative">
+            <button onclick="closeProfileModal()" class="absolute top-4 right-4 text-slate-400 hover:text-white transition-colors">
+                <i data-lucide="x" class="w-6 h-6"></i>
+            </button>
+            
+            <div class="text-center mb-8">
+                <h2 class="text-2xl font-bold">Edit Profile</h2>
+                <p class="text-slate-400 text-sm mt-1">Update your personal information.</p>
+            </div>
+
+            <div class="flex flex-col items-center gap-6">
+                <!-- Profile Image Preview -->
+                <div class="relative group">
+                    <div id="profile-preview" class="w-32 h-32 rounded-full bg-gradient-to-br from-primary to-emerald-400 border-4 border-white/10 overflow-hidden">
+                        <img id="profile-img-preview" src="" alt="" class="w-full h-full object-cover hidden">
+                    </div>
+                    <div class="absolute inset-0 flex items-center justify-center bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity rounded-full cursor-pointer">
+                        <i data-lucide="camera" class="text-white w-8 h-8"></i>
+                    </div>
+                </div>
+
+                <div class="w-full space-y-4">
+                    <button onclick="triggerGallery()" class="w-full flex items-center justify-center gap-3 py-3 bg-[#1c2427] border border-[#3b4d54] rounded-xl hover:bg-white/5 transition-all text-sm font-bold">
+                        <i data-lucide="image" class="w-5 h-5 text-primary"></i> Choose from Gallery
+                    </button>
+                    <button onclick="startCamera()" class="w-full flex items-center justify-center gap-3 py-3 bg-[#1c2427] border border-[#3b4d54] rounded-xl hover:bg-white/5 transition-all text-sm font-bold">
+                        <i data-lucide="camera" class="w-5 h-5 text-primary"></i> Capture from Camera
+                    </button>
+                </div>
+
+                <!-- Camera Preview (Hidden by default) -->
+                <div id="camera-container" class="hidden w-full space-y-4">
+                    <div class="relative aspect-square rounded-xl overflow-hidden bg-black border border-[#3b4d54]">
+                        <video id="camera-video" autoplay playsinline class="w-full h-full object-cover"></video>
+                        <canvas id="camera-canvas" class="hidden"></canvas>
+                    </div>
+                    <div class="flex gap-3">
+                        <button onclick="takePhoto()" class="flex-1 py-3 bg-primary text-white rounded-xl font-bold text-sm">Snap Photo</button>
+                        <button onclick="stopCamera()" class="px-6 py-3 bg-red-500/10 text-red-400 rounded-xl font-bold text-sm">Cancel</button>
+                    </div>
+                </div>
+            </div>
+
+            <input type="file" id="gallery-input" class="hidden" accept="image/*" onchange="handleGallerySelect(event)">
+            
+            <button onclick="saveProfile()" class="w-full mt-8 bg-primary hover:bg-primary/90 text-white font-bold py-4 rounded-xl shadow-[0_0_15px_rgba(19,182,236,0.3)] transition-all">
+                Save Changes
+            </button>
+        </div>
+    </div>
+
+    <!-- MOBILE SUGGESTION MODAL -->
+    <div id="mobile-suggestion" class="fixed inset-0 z-[100] hidden items-center justify-center bg-black/80 backdrop-blur-md p-6">
+        <div class="glass-card w-full max-w-sm rounded-2xl p-8 text-center space-y-6">
+            <div class="w-20 h-20 bg-primary/20 rounded-full flex items-center justify-center mx-auto border border-primary/30">
+                <i data-lucide="monitor" class="text-primary w-10 h-10"></i>
+            </div>
+            <div class="space-y-2">
+                <h3 class="text-xl font-bold">Desktop Mode Recommended</h3>
+                <p class="text-slate-400 text-sm leading-relaxed">
+                    FinSight AI is optimized for large displays. For the best precision intelligence experience, please <span class="text-primary font-bold">switch to Desktop Site mode</span> in your browser settings.
+                </p>
+            </div>
+            <button onclick="closeMobileSuggestion()" class="w-full py-4 bg-primary text-white rounded-xl font-bold shadow-lg">
+                I Understand
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Aspect Ratio & Mobile Detection
+        function checkDevice() {
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(navigator.userAgent);
+            if (isMobile) {
+                document.getElementById('mobile-suggestion').classList.remove('hidden');
+                document.getElementById('mobile-suggestion').classList.add('flex');
+            }
+        }
+
+        function closeMobileSuggestion() {
+            document.getElementById('mobile-suggestion').classList.add('hidden');
+            document.getElementById('mobile-suggestion').classList.remove('flex');
+        }
+
+        window.addEventListener('load', checkDevice);
+
+        // Initialize Lucide Icons
+        lucide.createIcons();
+
+        // Global State
+        let stream = null;
+        let spendings = [
+            { id: 1, date: '02 Mar', category: 'Food', desc: 'Starbucks Coffee', amount: 450 },
+            { id: 2, date: '05 Mar', category: 'Transport', desc: 'Uber Ride', amount: 320 },
+            { id: 3, date: '08 Mar', category: 'Shopping', desc: 'Amazon Electronics', amount: 12500 },
+            { id: 4, date: '10 Mar', category: 'Bills', desc: 'Wi-Fi Bill', amount: 1200 },
+            { id: 5, date: '12 Mar', category: 'Food', desc: 'Zomato Dinner', amount: 850 },
+            { id: 6, date: '15 Mar', category: 'Rent', desc: 'Apartment Maintenance', amount: 3500 },
+            { id: 7, date: '18 Mar', category: 'Entertainment', desc: 'Gaming Subscription', amount: 699 },
+            { id: 8, date: '20 Mar', category: 'Transport', desc: 'Petrol Refill', amount: 2000 },
+            { id: 9, date: '22 Mar', category: 'Shopping', desc: 'Nike Sneakers', amount: 8999 },
+            { id: 10, date: '25 Mar', category: 'Food', desc: 'Grocery Run', amount: 4200 },
+            { id: 11, date: '27 Mar', category: 'Misc', desc: 'Gift for Friend', amount: 1500 },
+            { id: 12, date: '29 Mar', category: 'Bills', desc: 'Water Bill', amount: 450 },
+            { id: 13, date: '30 Mar', category: 'Entertainment', desc: 'Cinema Tickets', amount: 1100 },
+            { id: 14, date: '31 Mar', category: 'Food', desc: 'Swiggy Lunch', amount: 550 }
+        ];
+
+        // Graph Logic
+        function updateGraph(period, btn) {
+            const container = document.getElementById('graph-container');
+            if (!container) return;
+
+            // Update UI
+            document.querySelectorAll('.graph-tab').forEach(t => {
+                t.classList.remove('bg-primary', 'text-white');
+                t.classList.add('text-slate-400');
+            });
+            btn.classList.remove('text-slate-400');
+            btn.classList.add('bg-primary', 'text-white');
+
+            // Configuration for 16:9
+            const padding = { top: 10, right: 10, bottom: 15, left: 30 };
+            const width = 160;
+            const height = 90;
+            const graphWidth = width - padding.left - padding.right;
+            const graphHeight = height - padding.top - padding.bottom;
+
+            // Generate Data
+            const points = [];
+            let xLabels = [];
+            let count = 0;
+
+            if (period === '1D') {
+                count = 8;
+                xLabels = ['00:00', '04:00', '08:00', '12:00', '16:00', '20:00', '23:59'];
+            } else if (period === '1W') {
+                count = 6;
+                xLabels = ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'];
+            } else {
+                count = 10;
+                xLabels = ['1', '5', '10', '15', '20', '25', '31'];
+            }
+
+            for (let i = 0; i <= count; i++) {
+                points.push({
+                    x: padding.left + (i / count) * graphWidth,
+                    y: padding.top + (Math.random() * graphHeight)
+                });
+            }
+
+            let svgContent = `
+                <svg class="w-full h-full" viewBox="0 0 ${width} ${height}">
+                    <defs>
+                        <linearGradient id="graph-grad" x1="0%" y1="0%" x2="0%" y2="100%">
+                            <stop offset="0%" stop-color="#13b6ec" stop-opacity="0.3" />
+                            <stop offset="100%" stop-color="transparent" />
+                        </linearGradient>
+                    </defs>
+                    
+                    <!-- Grid Lines -->
+                    <line x1="${padding.left}" y1="${padding.top}" x2="${width - padding.right}" y2="${padding.top}" stroke="#3b4d54" stroke-width="0.1" stroke-dasharray="1,1" />
+                    <line x1="${padding.left}" y1="${padding.top + graphHeight * 0.33}" x2="${width - padding.right}" y2="${padding.top + graphHeight * 0.33}" stroke="#3b4d54" stroke-width="0.1" stroke-dasharray="1,1" />
+                    <line x1="${padding.left}" y1="${padding.top + graphHeight * 0.66}" x2="${width - padding.right}" y2="${padding.top + graphHeight * 0.66}" stroke="#3b4d54" stroke-width="0.1" stroke-dasharray="1,1" />
+                    
+                    <!-- Axes -->
+                    <line x1="${padding.left}" y1="${padding.top}" x2="${padding.left}" y2="${padding.top + graphHeight}" stroke="#3b4d54" stroke-width="0.2" />
+                    <line x1="${padding.left}" y1="${padding.top + graphHeight}" x2="${width - padding.right}" y2="${padding.top + graphHeight}" stroke="#3b4d54" stroke-width="0.2" />
+
+                    <!-- Y-Axis Labels -->
+                    <text x="${padding.left - 3}" y="${padding.top + graphHeight}" fill="#94a3b8" font-size="2.5" text-anchor="end">₹0</text>
+                    <text x="${padding.left - 3}" y="${padding.top + graphHeight * 0.66}" fill="#94a3b8" font-size="2.5" text-anchor="end">₹5k</text>
+                    <text x="${padding.left - 3}" y="${padding.top + graphHeight * 0.33}" fill="#94a3b8" font-size="2.5" text-anchor="end">₹10k</text>
+                    <text x="${padding.left - 3}" y="${padding.top}" fill="#94a3b8" font-size="2.5" text-anchor="end">₹15k</text>
+
+                    <!-- X-Axis Labels -->
+            `;
+
+            xLabels.forEach((label, i) => {
+                const x = padding.left + (i / (xLabels.length - 1)) * graphWidth;
+                svgContent += `<text x="${x}" y="${height - 5}" fill="#94a3b8" font-size="2.5" text-anchor="middle">${label}</text>`;
+            });
+
+            // Path calculation
+            let pathD = `M ${points[0].x} ${points[0].y}`;
+            for (let i = 1; i < points.length; i++) {
+                pathD += ` L ${points[i].x} ${points[i].y}`;
+            }
+
+            // Fill area
+            const fillD = `${pathD} L ${points[points.length-1].x} ${padding.top + graphHeight} L ${points[0].x} ${padding.top + graphHeight} Z`;
+            svgContent += `<path d="${fillD}" fill="url(#graph-grad)" />`;
+            
+            // Line
+            svgContent += `<path d="${pathD}" fill="none" stroke="#13b6ec" stroke-width="0.4" stroke-linecap="round" stroke-linejoin="round" />`;
+
+            // Points
+            if (period === '1D' || period === '1W') {
+                points.forEach(p => {
+                    svgContent += `<circle cx="${p.x}" cy="${p.y}" r="${period === '1D' ? '0.6' : '0.4'}" fill="#13b6ec" />`;
+                });
+            }
+
+            svgContent += `</svg>`;
+            container.innerHTML = svgContent;
+        }
+
+        // Spending Table Logic
+        function renderSpendings() {
+            const body = document.getElementById('spendings-body');
+            const filter = document.getElementById('category-filter').value;
+            const totalDisplay = document.getElementById('total-spending-amount');
+            
+            if (!body) return;
+
+            const filtered = filter === 'All' ? spendings : spendings.filter(s => s.category === filter);
+            
+            let total = 0;
+            body.innerHTML = filtered.map(s => {
+                total += s.amount;
+                return `
+                    <tr class="hover:bg-white/5 transition-colors">
+                        <td class="px-6 py-4 text-slate-400">${s.date}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded-md ${getCategoryColor(s.category)} text-[10px] font-bold">${s.category}</span>
+                        </td>
+                        <td class="px-6 py-4 font-medium">${s.desc}</td>
+                        <td class="px-6 py-4 text-right font-bold">${s.amount.toLocaleString('en-IN')}</td>
+                    </tr>
+                `;
+            }).join('');
+
+            totalDisplay.innerText = `₹${total.toLocaleString('en-IN')}`;
+            lucide.createIcons();
+        }
+
+        function deleteSpending(id) {
+            if (confirm("Are you sure you want to remove this expense?")) {
+                spendings = spendings.filter(s => s.id !== id);
+                renderSpendings();
+            }
+        }
+
+        function getCategoryColor(cat) {
+            const colors = {
+                'Rent': 'bg-blue-500/10 text-blue-400',
+                'Food': 'bg-green-500/10 text-green-400',
+                'Transport': 'bg-yellow-500/10 text-yellow-400',
+                'Entertainment': 'bg-purple-500/10 text-purple-400',
+                'Shopping': 'bg-pink-500/10 text-pink-400',
+                'Bills': 'bg-orange-500/10 text-orange-400',
+                'Subscriptions': 'bg-indigo-500/10 text-indigo-400',
+                'Misc': 'bg-slate-500/10 text-slate-400'
+            };
+            return colors[cat] || 'bg-slate-500/10 text-slate-400';
+        }
+
+        // Screen Switching Logic
+        function showScreen(screenId) {
+            const screens = document.querySelectorAll('.screen');
+            screens.forEach(s => s.classList.remove('active'));
+            
+            const target = document.getElementById(screenId);
+            target.classList.add('active');
+            
+            // Toggle background decorations visibility
+            const bgDecor = document.getElementById('bg-decor');
+            if (screenId === 'dashboard-screen') {
+                bgDecor.style.display = 'none';
+                document.body.classList.remove('mesh-gradient');
+                renderSpendings(); // Ensure table is rendered on dashboard
+                
+                // Initialize Graph
+                setTimeout(() => {
+                    const defaultBtn = document.querySelector('.graph-tab.bg-primary');
+                    if (defaultBtn) updateGraph('1M', defaultBtn);
+                }, 100);
+            } else {
+                bgDecor.style.display = 'block';
+                document.body.classList.add('mesh-gradient');
+            }
+            
+            // Refresh icons in new screen
+            lucide.createIcons();
+        }
+
+        // Profile Modal Logic
+        function openProfileModal() {
+            document.getElementById('profile-modal').classList.remove('hidden');
+            document.getElementById('profile-modal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeProfileModal() {
+            stopCamera();
+            document.getElementById('profile-modal').classList.add('hidden');
+            document.getElementById('profile-modal').classList.remove('flex');
+        }
+
+        // Gallery Logic
+        function triggerGallery() {
+            document.getElementById('gallery-input').click();
+        }
+
+        function handleGallerySelect(event) {
+            const file = event.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    updatePreview(e.target.result);
+                };
+                reader.readAsDataURL(file);
+            }
+        }
+
+        // Camera Logic
+        async function startCamera() {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } });
+                const video = document.getElementById('camera-video');
+                video.srcObject = stream;
+                document.getElementById('camera-container').classList.remove('hidden');
+                // Hide gallery/camera buttons while camera is active
+                document.querySelector('.w-full.space-y-4').classList.add('hidden');
+            } catch (err) {
+                alert("Camera access denied or not available.");
+                console.error(err);
+            }
+        }
+
+        function stopCamera() {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+            }
+            document.getElementById('camera-container').classList.add('hidden');
+            document.querySelector('.w-full.space-y-4').classList.remove('hidden');
+        }
+
+        function takePhoto() {
+            const video = document.getElementById('camera-video');
+            const canvas = document.getElementById('camera-canvas');
+            const context = canvas.getContext('2d');
+            
+            canvas.width = video.videoWidth;
+            canvas.height = video.videoHeight;
+            context.drawImage(video, 0, 0, canvas.width, canvas.height);
+            
+            const dataUrl = canvas.toDataURL('image/png');
+            updatePreview(dataUrl);
+            stopCamera();
+        }
+
+        function updatePreview(src) {
+            const img = document.getElementById('profile-img-preview');
+            img.src = src;
+            img.classList.remove('hidden');
+            document.getElementById('profile-preview').classList.add('border-primary');
+        }
+
+        function saveProfile() {
+            const previewImg = document.getElementById('profile-img-preview');
+            if (!previewImg.classList.contains('hidden')) {
+                // Update all profile images in the UI
+                const profilePics = document.querySelectorAll('.w-8.h-8.rounded-full.bg-gradient-to-br');
+                profilePics.forEach(pic => {
+                    pic.style.backgroundImage = `url(${previewImg.src})`;
+                    pic.style.backgroundSize = 'cover';
+                    pic.style.backgroundPosition = 'center';
+                    pic.classList.remove('from-primary', 'to-emerald-400');
+                });
+            }
+            closeProfileModal();
+        }
+
+        // Password Visibility Toggle
+        function togglePass(inputId) {
+            const input = document.getElementById(inputId);
+            input.type = input.type === 'password' ? 'text' : 'password';
+        }
+
+        // Form Submissions
+        document.getElementById('login-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            showScreen('dashboard-screen');
+        });
+
+        document.getElementById('register-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const pass = document.getElementById('reg-pass').value;
+            const confirm = document.getElementById('reg-confirm').value;
+            const error = document.getElementById('reg-error');
+
+            if (pass !== confirm) {
+                error.classList.remove('hidden');
+                return;
+            }
+            error.classList.add('hidden');
+            showScreen('income-screen');
+        });
+
+        document.getElementById('income-form').addEventListener('submit', (e) => {
+            e.preventDefault();
+            const budgetValue = document.getElementById('budget-input').value;
+            const displayBudget = document.getElementById('display-budget');
+            
+            // Format the budget as Indian Rupee currency
+            const formatter = new Intl.NumberFormat('en-IN', {
+                style: 'currency',
+                currency: 'INR',
+                maximumFractionDigits: 2
+            });
+            
+            displayBudget.innerText = formatter.format(budgetValue);
+            showScreen('dashboard-screen');
+        });
+
+        // Workable Interface Interactions
+        function generateReport(btn) {
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = `<i data-lucide="loader-2" class="w-4 h-4 animate-spin"></i> Generating...`;
+            lucide.createIcons();
+
+            setTimeout(() => {
+                btn.innerHTML = `<i data-lucide="check" class="w-4 h-4"></i> Report Ready`;
+                lucide.createIcons();
+                btn.classList.replace('bg-primary', 'bg-green-500');
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.classList.replace('bg-green-500', 'bg-primary');
+                    lucide.createIcons();
+                    alert("Your AI-powered financial report has been generated and saved to your downloads.");
+                }, 2000);
+            }, 3000);
+        }
+
+        function handleSearch(e) {
+            if (e.key === 'Enter') {
+                const query = e.target.value;
+                if (query.trim()) {
+                    alert(`Searching for "${query}"... \n\nFinSight AI is analyzing market data. No specific matches found in your current portfolio.`);
+                }
+            }
+        }
+
+        function showComingSoon(feature) {
+            alert(`${feature} module is currently being optimized by FinSight AI. \n\nExpected release: Q3 2026.`);
+        }
+
+        function toggleNotifications() {
+            alert("You have 3 new AI insights: \n1. Market volatility expected in Tech sector. \n2. Your portfolio is up 2.4% today. \n3. New investment opportunity detected.");
+        }
+    </script>
+    </div> <!-- End app-container -->
+</body>
+</html>
+
